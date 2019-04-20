@@ -11,13 +11,17 @@ import org.springframework.web.servlet.ModelAndView;
 import ua.pride.models.User;
 import ua.pride.repositories.UserRepo;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+
 @RestController
 public class UserController {
 
     @Autowired
     UserRepo userRepo;
 
-    SessionFactory sessionFactory = new Configuration().configure().buildSessionFactory();
+    String username;
 
     @GetMapping(value = {"/", "/home"})
     public ModelAndView home() {
@@ -34,9 +38,12 @@ public class UserController {
     }
 
     @PostMapping(value = "/addUser")
-    public ModelAndView addUser(@ModelAttribute User user) {
+    public ModelAndView addUser(@ModelAttribute User user, HttpServletRequest request, HttpServletResponse response) {
         ModelAndView modelAndView = new ModelAndView("redirect:/home");
         userRepo.save(user);
+        HttpSession session = request.getSession();
+        username = request.getParameter("username");
+        session.setAttribute("username", username);
         return modelAndView;
     }
 
